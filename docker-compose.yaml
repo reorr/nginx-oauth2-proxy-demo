@@ -19,7 +19,7 @@ services:
       - keycloak
 
   keycloak:
-    image: jboss/keycloak:16.1.0
+    image: quay.io/keycloak/keycloak:16.1.0
     environment:
       - DB_ADDR=mariadb
       - DB_USER=keycloak
@@ -55,6 +55,8 @@ services:
       - proxy-network
     volumes:
       - vol-mariadb:/var/lib/mysql
+    ports:
+      - 3306:3306
 
   server:
     image: kennethreitz/httpbin
