@@ -6,15 +6,31 @@ services:
     image: quay.io/oauth2-proxy/oauth2-proxy:v7.2.1
     container_name: oauth2-proxy
     command: --config /oauth2-proxy.cfg
-    ports:
-      - 4180:4180
-      - 443:443
+    # ports:
+    #   - 4180:4180
+    #   - 443:443
     environment:
       - OAUTH2_PROXY_COOKIE_SECRET=MTExMTExMTExMTExMTExMQ==
     networks:
       - proxy-network
     volumes:
       - ./config/oauth2-proxy.cfg:/oauth2-proxy.cfg
+    depends_on:
+      - keycloak
+
+  proxy-pastebin:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.2.1
+    container_name: oauth2-proxy-pastebin
+    command: --config /pb.oauth2-proxy.cfg
+    # ports:
+    #   - 4180:4180
+    #   - 443:443
+    environment:
+      - OAUTH2_PROXY_COOKIE_SECRET=MTExMTExMTExMTExMTExMQ==
+    networks:
+      - proxy-network
+    volumes:
+      - ./config/pb.oauth2-proxy.cfg:/pb.oauth2-proxy.cfg
     depends_on:
       - keycloak
 
@@ -65,6 +81,20 @@ services:
     ports:
       - 8000:80
     container_name: server
+    networks:
+      - proxy-network
+
+  pastebin:
+    image: wantguns/bin
+    container_name: pastebin
+    ports:
+      - 6163:6163
+    environment:
+      - BIN_PORT=6163 # Defaults to 6162
+      - BIN_LIMITS={form="16 MiB"}
+      - BIN_CLIENT_DESC=placeholder
+    volumes:
+      - ./upload:/upload
     networks:
       - proxy-network
 
